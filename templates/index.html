@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI UI Design Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link id="dynamicFont" rel="stylesheet" href="">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body data-theme="dark">
+
+    <nav class="glass-nav">
+        <div class="logo">AI<span>Studio</span></div>
+        <div class="nav-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Switch Theme">
+                <i id="theme-icon" class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div id="landing-view" class="landing-container">
+        <h1 class="landing-title">AI Design Suggester</h1>
+        <p class="landing-subtitle">Generate tailored UI kits. From high-conversion Commercial layouts to trusted Professional systems.</p>
+        
+        <div class="landing-box">
+            <div class="control-group">
+                <label>Select Industry</label>
+                <select id="start-cat">
+                    <option value="" disabled selected>Select an Industry...</option>
+                    <option value="Automotive">Automotive</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                    <option value="Education">Education</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Food">Food</option>
+                    <option value="Gaming">Gaming</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Interior">Interior</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Music">Music</option>
+                    <option value="Non-Profit">Non-Profit</option>
+                    <option value="Photography">Photography</option>
+                    <option value="Real Estate">Real Estate</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Travel">Travel</option>
+                </select>
+            </div>
+            <button class="primary-btn" onclick="startApp()" style="margin-top:10px;">Start Designing 🚀</button>
+        </div>
+    </div>
+
+    <main id="dashboard-view" class="studio-container hidden-section">
+        <aside class="controls-panel">
+            <div class="sidebar-header" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; margin-bottom: 1.5rem;">
+                <button class="secondary-btn" onclick="goHome()" style="margin: 0; padding: 6px 12px; font-size: 0.8rem; width: fit-content;">⬅ Back to Home</button>
+            </div>
+            
+            <div class="control-group">
+                <label>Industry</label>
+                <select id="catInput" onchange="generateDesign()">
+                    <option value="Automotive">Automotive</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                    <option value="Education">Education</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Food">Food</option>
+                    <option value="Gaming">Gaming</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Interior">Interior</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Music">Music</option>
+                    <option value="Non-Profit">Non-Profit</option>
+                    <option value="Photography">Photography</option>
+                    <option value="Real Estate">Real Estate</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Travel">Travel</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Custom Brand Image (Optional)</label>
+                <input type="file" id="customImage" accept="image/*" onchange="handleImageUpload(event)" style="font-size: 0.8rem; width: 100%; color: var(--text-color); margin-bottom: 5px;">
+                <button class="secondary-btn" onclick="clearCustomImage()" style="display: none; width: 100%; padding: 6px;" id="clearImgBtn">Clear Image</button>
+            </div>
+
+            <div class="slider-container">
+                <label>Style: <span id="mood-label" style="color:var(--ai-ter); font-weight:bold;">Balanced</span></label>
+                <input type="range" id="vibeSlider" min="0" max="4" value="2" step="1" oninput="updateMoodLabel()" onchange="generateDesign()">
+                <div class="slider-labels">
+                    <span>Commercial</span>
+                    <span>Professional</span>
+                </div>
+            </div>
+
+            <hr class="divider">
+            
+            <div class="live-palette">
+                <label>Active Palette (Live Edit)</label>
+                <div class="color-palette">
+                    <input type="color" id="swatch-pri" class="swatch" value="#ffffff" oninput="updateColor('pri', this.value)">
+                    <input type="color" id="swatch-sec" class="swatch" value="#000000" oninput="updateColor('sec', this.value)">
+                    <input type="color" id="swatch-ter" class="swatch" value="#6366f1" oninput="updateColor('ter', this.value)">
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="suggester-block">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">AI UX Assistant</label>
+                <button class="secondary-btn" id="analyzeBtn" onclick="analyzeDesign()" style="width: 100%; margin-bottom: 10px; border-color: var(--ai-ter); color: var(--ai-ter);">
+                    <i class="fas fa-magic"></i> Analyze Design
+                </button>
+                <div id="aiSuggestions" class="suggestion-box">
+                    <ul id="suggestionList"></ul>
+                </div>
+            </div>
+
+            <div class="export-actions">
+                <button class="secondary-btn" onclick="viewCode()"><i class="fas fa-code"></i> Code</button>
+                <button class="secondary-btn download-btn" onclick="downloadCode()"><i class="fas fa-download"></i> Zip</button>
+            </div>
+        </aside>
+
+        <section class="preview-area">
+            <div id="mockup-canvas" class="canvas-container">
+                <div class="preview-placeholder">
+                    <i class="fas fa-magic fa-3x" style="color: var(--ai-ter); margin-bottom: 20px;"></i>
+                    <h2>Awaiting Generation</h2>
+                    <p>Select your industry and vibe, then click generate to see the AI's layout.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ==========================================
+        // APP LOGIC (WITH SPINNER & CACHE SUPPORT)
+        // ==========================================
+        let currentData = null;
+        let customImageBase64 = null; 
+        const FALLBACK_IMG = 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1600&q=80';
+        const VIBE_LABELS = ['High Commercial', 'Promotional', 'Balanced', 'Corporate', 'Strictly Professional'];
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                customImageBase64 = event.target.result;
+                document.getElementById('clearImgBtn').style.display = 'block';
+                if(currentData) {
+                    currentData.custom_image = customImageBase64;
+                    renderLayout(currentData, currentData.category);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearCustomImage() {
+            customImageBase64 = null;
+            document.getElementById('customImage').value = '';
+            document.getElementById('clearImgBtn').style.display = 'none';
+            if(currentData) {
+                delete currentData.custom_image;
+                renderLayout(currentData, currentData.category);
+            }
+        }
+
+        function startApp() {
+            let startCat = document.getElementById("start-cat").value;
+            if (!startCat) return alert("Select an industry first!");
+            document.getElementById("catInput").value = startCat;
+            document.getElementById("landing-view").classList.add("hidden-section");
+            document.getElementById("dashboard-view").classList.remove("hidden-section");
+            generateDesign();
+        }
+
+        function goHome() {
+            document.getElementById("dashboard-view").classList.add("hidden-section");
+            document.getElementById("landing-view").classList.remove("hidden-section");
+        }
+
+        function updateMoodLabel() {
+            document.getElementById("mood-label").innerText = VIBE_LABELS[document.getElementById("vibeSlider").value];
+        }
+
+        function updateColor(type, hexVal) {
+            document.documentElement.style.setProperty(`--ai-${type}`, hexVal);
+            if(currentData) {
+                if(type === 'pri') currentData.primary = hexVal;
+                if(type === 'sec') currentData.secondary = hexVal;
+                if(type === 'ter') currentData.tertiary = hexVal;
+            }
+        }
+
+        function updateFont(fontName) {
+            const fontId = (fontName || "Inter").split('(')[0].trim();
+            document.getElementById('dynamicFont').href = `https://fonts.googleapis.com/css2?family=${fontId.replace(/ /g, '+')}:wght@400;600;700&display=swap`;
+            document.documentElement.style.setProperty('--ai-font', `'${fontId}', sans-serif`);
+        }
+
+        function switchPreviewPage(pageId) {
+            document.querySelectorAll('.mock-page').forEach(page => page.style.display = 'none');
+            document.getElementById('page-' + pageId).style.display = 'block';
+            document.querySelectorAll('.mock-links span').forEach(link => link.style.opacity = '0.6');
+            if(document.getElementById('nav-' + pageId)) document.getElementById('nav-' + pageId).style.opacity = '1';
+        }
+
+        function renderLayout(data, cat) {
+            const canvas = document.getElementById('mockup-canvas');
+            const layoutName = (data.layout || "").toLowerCase();
+            const layoutClass = 'layout-' + layoutName.replace(/ /g, '-');
+            canvas.className = `canvas-container ${layoutClass}`;
+            
+            const finalImgUrl = data.custom_image ? data.custom_image : (data.img_url || FALLBACK_IMG);
+            
+            const navHTML = `
+                <div class="mock-nav">
+                    <div class="mock-logo">${cat}<span>.</span></div>
+                    <div class="mock-links">
+                        <span id="nav-home" onclick="switchPreviewPage('home')" style="opacity:1;">Home</span>
+                        <span id="nav-about" onclick="switchPreviewPage('about')" style="opacity:0.6;">About</span>
+                        <span id="nav-contact" onclick="switchPreviewPage('contact')" style="opacity:0.6;">Contact</span>
+                    </div>
+                    <button class="mock-nav-btn" onclick="switchPreviewPage('contact')">Get Started</button>
+                </div>
+            `;
+
+            let homeHTML = '';
+            if (layoutName.includes("grid") || layoutName.includes("masonry")) {
+                homeHTML = `
+                    <div class="grid-header">
+                        <h2 contenteditable="true" class="editable-text">${data.headline}</h2>
+                        <p contenteditable="true" class="editable-text">${data.sub}</p>
+                    </div>
+                    <div class="grid-content">
+                        ${[1,2,3,4].map(i => `
+                            <div class="grid-card item-${i}">
+                                <div class="card-img-wrapper"><img src="${finalImgUrl}" onerror="this.src='${FALLBACK_IMG}'"></div>
+                                <div class="card-text"><h3>Feature ${i}</h3><p>Optimized solution.</p></div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+            } else if (layoutName.includes("split") || layoutName.includes("z-pattern") || layoutName.includes("right align")) {
+                homeHTML = `
+                    <div class="split-text">
+                        <span class="tag">Featured Release</span>
+                        <h2 contenteditable="true" class="editable-text">${data.headline}</h2>
+                        <p contenteditable="true" class="editable-text">${data.sub}</p>
+                        <button class="sample-btn" onclick="switchPreviewPage('about')">Learn More</button>
+                    </div>
+                    <div class="split-image"><img src="${finalImgUrl}" onerror="this.src='${FALLBACK_IMG}'"></div>`;
+            } else {
+                homeHTML = `
+                    <div class="hero-bg">
+                        <div class="dark-overlay"></div>
+                        <img src="${finalImgUrl}" onerror="this.src='${FALLBACK_IMG}'">
+                    </div>
+                    <div class="hero-content">
+                        <h2 contenteditable="true" class="editable-text">${data.headline}</h2>
+                        <p contenteditable="true" class="editable-text">${data.sub}</p>
+                        <button class="sample-btn" onclick="switchPreviewPage('about')">Get Started</button>
+                    </div>`;
+            }
+
+            const aboutHTML = `
+                <div class="mock-about-page">
+                    <div class="inner-page-wrapper">
+                        <h2 style="font-size: 3rem; margin-bottom: 1rem; color: var(--ai-pri);">About ${cat} Solutions</h2>
+                        <p style="font-size: 1.2rem; color: var(--ai-pri); opacity: 0.8; max-width: 600px; margin: 0 auto 3rem auto;">We are a leading provider of innovative systems designed specifically for the ${cat} industry. Our AI-driven approach ensures you always stay ahead of the competition.</p>
+                    </div>
+                </div>
+            `;
+
+            const contactHTML = `
+                <div class="mock-contact-page">
+                    <div class="inner-page-wrapper">
+                        <h2 style="font-size: 3rem; margin-bottom: 1rem; color: var(--ai-pri);">Contact Us</h2>
+                        <form class="mock-form">
+                            <input type="text" placeholder="Your Name" style="padding:10px; margin-bottom:10px; width:100%; max-width:300px; border-radius:5px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:var(--ai-pri);">
+                            <textarea placeholder="Message" rows="3" style="padding:10px; margin-bottom:10px; width:100%; max-width:300px; border-radius:5px; border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:var(--ai-pri);"></textarea>
+                            <button type="button" class="sample-btn" style="width:100%; max-width:300px;">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            canvas.innerHTML = `
+                <div class="preview-card">
+                    ${layoutName.includes("sidebar") ? "" : navHTML}
+                    ${layoutName.includes("sidebar") ? `<div style="display:flex; flex-direction:column; width:220px; border-right:1px solid rgba(128,128,128,0.2); padding:2rem; gap:2rem;"><div class="mock-logo">${cat}<span>.</span></div><div class="mock-links" style="flex-direction:column; gap:1.5rem;"><span onclick="switchPreviewPage('home')">Home</span><span onclick="switchPreviewPage('about')">About</span><span onclick="switchPreviewPage('contact')">Contact</span></div></div>` : ""}
+                    <div style="flex:1; position:relative; overflow:hidden;">
+                        <div id="page-home" class="mock-page" style="display: block; height: 100%;">${homeHTML}</div>
+                        <div id="page-about" class="mock-page" style="display: none; height: 100%;">${aboutHTML}</div>
+                        <div id="page-contact" class="mock-page" style="display: none; height: 100%;">${contactHTML}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function generateDesign() {
+            document.getElementById('aiSuggestions').style.display = 'none';
+            const cat = document.getElementById('catInput').value;
+            const vibeIndex = document.getElementById('vibeSlider').value;
+
+            // --- SHOW LOADING SPINNER ---
+            const canvas = document.getElementById('mockup-canvas');
+            canvas.className = 'canvas-container';
+            canvas.innerHTML = `
+                <div class="preview-placeholder">
+                    <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--ai-ter); margin-bottom: 20px;"></i>
+                    <h2>Generating UI Kit...</h2>
+                    <p>The AI is retrieving layouts and assets for ${cat}.</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ category: cat, vibe_value: vibeIndex, variation: Math.floor(Math.random() * 5) })
+                });
+                
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error("Server error: " + errText);
+                }
+                
+                const data = await response.json();
+                if(customImageBase64) data.custom_image = customImageBase64;
+                currentData = data;
+
+                updateColor('pri', data.primary);
+                updateColor('sec', data.secondary);
+                updateColor('ter', data.tertiary);
+                
+                try {
+                    document.getElementById('swatch-pri').value = data.primary;
+                    document.getElementById('swatch-sec').value = data.secondary;
+                    document.getElementById('swatch-ter').value = data.tertiary;
+                } catch(e) {}
+
+                updateFont(data.font);
+                
+                // Add slight delay to let fonts load smoothly
+                setTimeout(() => {
+                    renderLayout(data, cat);
+                }, 150);
+
+            } catch (error) { 
+                console.error("FULL ERROR DETAILS:", error);
+                canvas.innerHTML = `
+                    <div class="preview-placeholder">
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #ef4444; margin-bottom: 20px;"></i>
+                        <h2>Generation Failed</h2>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function analyzeDesign() {
+            if(!currentData) return alert("Generate a design first before asking for suggestions!");
+            const btn = document.getElementById('analyzeBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            try {
+                const response = await fetch('/suggest', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(currentData)
+                });
+                const result = await response.json();
+                if(result.error) throw new Error(result.error);
+                
+                const list = document.getElementById('suggestionList');
+                list.innerHTML = ''; 
+                result.suggestions.forEach(sug => {
+                    const li = document.createElement('li');
+                    li.innerText = sug;
+                    list.appendChild(li);
+                });
+                document.getElementById('aiSuggestions').style.display = 'block';
+            } catch (err) { alert("Failed to get AI suggestions: " + err.message);
+            } finally { btn.innerHTML = '<i class="fas fa-magic"></i> Analyze Design'; }
+        }
+
+        async function downloadCode() {
+            if(!currentData) return alert("Wait for the AI!");
+            const btn = document.querySelector('.download-btn');
+            const ogText = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zip...';
+            try {
+                let response = await fetch('/download', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(currentData) });
+                let blob = await response.blob(); let url = window.URL.createObjectURL(blob);
+                let a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = "ai_design_spa_kit.zip"; 
+                document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); document.body.removeChild(a);
+            } catch (error) { alert("Download failed."); } finally { btn.innerHTML = ogText; }
+        }
+
+        async function viewCode() {
+            if(!currentData) return alert("Generate design first!");
+            let codeWindow = window.open("", "_blank");
+            if (!codeWindow) return alert("Pop-up blocked!");
+            codeWindow.document.write("<h2>Generating code...</h2>");
+            
+            try {
+                let response = await fetch('/view-code', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(currentData) 
+                });
+                let codeData = await response.json(); 
+                
+                // Escape characters for safe HTML rendering
+                let homeHTML = codeData.html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                let styleCSS = codeData.css.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                let scriptJS = codeData.js.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                
+                codeWindow.document.open(); 
+                codeWindow.document.write(`<!DOCTYPE html>
+                <html>
+                <head>
+                    <title>AI Design Kit Code</title>
+                    <style>
+                        body { font-family: sans-serif; background: #1e1e1e; color: #d4d4d4; padding: 20px; }
+                        .header-row { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; margin-top: 30px; padding-bottom: 5px; }
+                        h3 { color: #569cd6; margin: 0; font-size: 1.2rem; }
+                        pre { background: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto; border: 1px solid #404040; margin-top: 10px; }
+                        code { font-family: Consolas, Monaco, monospace; }
+                        button { background: #0e639c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+                        button:hover { background: #1177bb; }
+                    </style>
+                </head>
+                <body>
+                    <h2 style="color: white; border-bottom: 2px solid #569cd6; padding-bottom: 10px; display: inline-block;">Your Generated Tailwind UI Kit</h2>
+                    
+                    <div class="header-row">
+                        <h3>index.html</h3>
+                        <button onclick="copyCode('html-block')">Copy HTML</button>
+                    </div>
+                    <pre><code id="html-block">${homeHTML}</code></pre>
+                    
+                    <div class="header-row">
+                        <h3>script.js</h3>
+                        <button onclick="copyCode('js-block')">Copy JS</button>
+                    </div>
+                    <pre><code id="js-block">${scriptJS}</code></pre>
+
+                    <div class="header-row">
+                        <h3>style.css</h3>
+                        <button onclick="copyCode('css-block')">Copy CSS</button>
+                    </div>
+                    <pre><code id="css-block">${styleCSS}</code></pre>
+
+                    <script>
+                        function copyCode(elementId) {
+                            const code = document.getElementById(elementId).innerText;
+                            navigator.clipboard.writeText(code).then(() => {
+                                alert('Code copied to clipboard!');
+                            }).catch(err => {
+                                alert('Failed to copy: ' + err);
+                            });
+                        }
+                    <\/script>
+                </body>
+                </html>`); 
+                codeWindow.document.close();
+            } catch (error) { 
+                codeWindow.document.body.innerHTML = "<h2>Error generating code</h2>"; 
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                icon.className = 'fas fa-sun';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-moon';
+            }
+        }
+    </script>
+</body>
+</html>
